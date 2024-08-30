@@ -9,7 +9,7 @@ namespace WordCreator
     public class Program
     {
         private static HashSet<string> _dictionary;
-        private static List<string> _history;
+        private static List<string> _validWords;
         private static int _colorCounter = 0;
         private static readonly ConsoleColor[] _consoleColors = {ConsoleColor.Red, ConsoleColor.Green, ConsoleColor.Yellow, ConsoleColor.Blue, ConsoleColor.Magenta, ConsoleColor.Cyan};
 
@@ -20,21 +20,22 @@ namespace WordCreator
             while (true)
             {
                 Console.ForegroundColor = ConsoleColor.White;
-                _history = new List<string>();
+                _validWords = [];
 
                 Console.Write("\nType in the letters: ");
 
-                List<string> elements = Console.ReadLine()
+                List<string> letters = Console.ReadLine()
                     .Where(l => char.IsLetter(l))
                     .Select(l => l.ToString())
                     .ToList();
 
                 Console.WriteLine("Valid Words:");
+
                 //use all lengths possible
-                for (int i = elements.Count; i > 2; i--)
+                for (int i = letters.Count; i > 2; i--)
                 {
                     string[] combinations = new string[i];
-                    Combine(combinations, elements, i);
+                    Combine(combinations, letters, i);
                 }
 
             }
@@ -44,31 +45,31 @@ namespace WordCreator
         /// Arrange every possible combination (w/o repeating elements) and prints the valid English words
         /// </summary>
         /// <param name="combinations">An empty array of length equal to lenght of each combination</param>
-        /// <param name="elements">Elements to use in the combinations</param>
+        /// <param name="letters">Letters to use in the combinations</param>
         /// <param name="combinationLength">Length of each resulting combination</param>
-        private static void Combine(string[] combinations, List<string> elements, int combinationLength)
+        private static void Combine(string[] combinations, List<string> letters, int combinationLength)
         {
-            if (combinationLength > elements.Count)
+            if (combinationLength > letters.Count)
                 throw new ArgumentException("length has to be <= element count");
 
             if (combinationLength == 0)
             {
                 string word = string.Join("", combinations);
-                if (_dictionary.Contains(word) && !_history.Contains(word))
+                if (_dictionary.Contains(word) && !_validWords.Contains(word))
                 {
-                    _history.Add(word);
+                    _validWords.Add(word);
                     ColorfulPrint(word);
                 }
                 return;
             }
 
-            foreach (var item in elements)
+            foreach (var letter in letters)
             {
-                combinations[combinations.Length - combinationLength] = item;
+                combinations[combinations.Length - combinationLength] = letter;
 
                 var tempList = new List<string>();
-                tempList.AddRange(elements);
-                tempList.Remove(item);
+                tempList.AddRange(letters);
+                tempList.Remove(letter);
 
                 Combine(combinations, tempList, combinationLength - 1);
             }
